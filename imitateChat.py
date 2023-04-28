@@ -22,9 +22,9 @@ lastCnt = {}
 def receiveMessage (mes, gid):
     if (gid not in lastCnt):
         lastCnt[gid] = -3
-    if (mes not in chatMessage):
+    if (checkImage(mes) is False and mes not in chatMessage):
         chatMessage.append(mes)
-    if (gid not in groupMessage):
+    if (checkImage(mes) is False and gid not in groupMessage):
         groupMessage[gid] = mes
     else:
         lastMessage = groupMessage[gid]
@@ -34,7 +34,10 @@ def receiveMessage (mes, gid):
             relateMessage[lastMessage][mes] = 1
         else:
             relateMessage[lastMessage][mes] += 1
-        groupMessage[gid] = mes
+        if (checkImage(mes) is False):
+            groupMessage[gid] = mes
+    if (checkImage(mes) is True):
+        return
     rand = random.uniform(0, 1)
     if (rand > 1 / (1 + exp(-lastCnt[gid]))):
         lastCnt[gid] += 1
@@ -42,12 +45,17 @@ def receiveMessage (mes, gid):
     lastCnt[gid] = -3
     predictMessage(mes, gid)
     
+def checkImage (mes):
+    if ("CQ:image" in mes):
+        return True
+    return False
+
 def predictMessage (mes, gid):
     messageDocList = [word for word in jieba.cut(mes, cut_all = True)]
     messageDocVec = dictionary.doc2bow(messageDocList)
     sims = index[tfidf[messageDocVec]]
     sims = sorted(enumerate(sims), key = lambda item: -item[1])
-    if (sims[0][1] < 0.7):
+    if (sims[0][1] < 0.6):
         return
     response = randomResponseMessage(chatMessage[sims[0][0]])
     if (response is None):
