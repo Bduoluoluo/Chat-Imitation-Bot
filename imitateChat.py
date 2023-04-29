@@ -5,6 +5,7 @@ import time
 import api
 import random
 from math import exp
+import re
 
 chatMessage = []
 
@@ -21,12 +22,13 @@ lastCnt = {}
 
 def receiveMessage (mes, gid):
     if (gid not in lastCnt):
-        lastCnt[gid] = -3
-    if (checkImage(mes) is False and mes not in chatMessage):
+        lastCnt[gid] = -5
+    mes = processMessage(mes)
+    if (len(mes) == 0):
+        return
+    if (mes not in chatMessage):
         chatMessage.append(mes)
-    if (checkImage(mes) is False and gid not in groupMessage):
-        groupMessage[gid] = mes
-    else:
+    if (gid in groupMessage):
         lastMessage = groupMessage[gid]
         if (lastMessage not in relateMessage):
             relateMessage[lastMessage] = {}
@@ -34,32 +36,35 @@ def receiveMessage (mes, gid):
             relateMessage[lastMessage][mes] = 1
         else:
             relateMessage[lastMessage][mes] += 1
-        if (checkImage(mes) is False):
-            groupMessage[gid] = mes
-    if (checkImage(mes) is True):
-        return
+    groupMessage[gid] = mes
     rand = random.uniform(0, 1)
     if (rand > 1 / (1 + exp(-lastCnt[gid]))):
         lastCnt[gid] += 1
         return
-    lastCnt[gid] = -3
     predictMessage(mes, gid)
     
-def checkImage (mes):
-    if ("CQ:image" in mes):
-        return True
-    return False
+def processMessage (mes):
+    res = re.sub(r'\[CQ:(.*)\]', "", mes)
+    res = re.sub(r'^\s*', "", res)
+    return res
 
 def predictMessage (mes, gid):
-    messageDocList = [word for word in jieba.cut(mes, cut_all = True)]
+    messageDocList = [word for word in jieba.cut(mes)]
     messageDocVec = dictionary.doc2bow(messageDocList)
     sims = index[tfidf[messageDocVec]]
     sims = sorted(enumerate(sims), key = lambda item: -item[1])
-    if (sims[0][1] < 0.6):
+    if (sims[0][1] < 0.7):
         return
     response = randomResponseMessage(chatMessage[sims[0][0]])
     if (response is None):
+        lastCnt[gid] += 1
         return
+    lastCnt[gid] = -5
+
+    # 不能水的群
+    if (gid == 1030450471 or gid == 260324771):
+        return
+
     api.send_msg(response, uid = None, gid = gid)
 
 def randomResponseMessage (mes):
@@ -100,7 +105,7 @@ def loadMessge ():
     # 训练聊天记录
     texts_list=[]
     for sentence in chatMessage:
-        sentence_list = [word for word in jieba.cut(sentence, cut_all=True)]
+        sentence_list = [word for word in jieba.cut(sentence)]
         texts_list.append(sentence_list)
     
     dictionary = corpora.Dictionary(texts_list)
