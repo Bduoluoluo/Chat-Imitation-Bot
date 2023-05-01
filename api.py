@@ -1,14 +1,17 @@
 import requests
 from imitateChat import receiveMessage
 from urllib import parse
-from imitateChat import saveMessage
+import trainMessage
 
 baseUrl = 'http://127.0.0.1:5700/'
 
 # 消息
 def reveiveMes (message, uid, gid = None, rol = None, mid = None):
     if (message == "#save"):
-        saveMessage()
+        trainMessage.training = True
+        trainMessage.train()
+        trainMessage.training = False
+        trainMessage.saveMessage()
         return
     receiveMessage(message, gid)
 

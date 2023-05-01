@@ -1,6 +1,6 @@
 from flask import Flask, request
 from api import reveiveMes
-from imitateChat import startChat
+from trainMessage import initialTrain
 
 app = Flask(__name__)
 
@@ -23,7 +23,7 @@ def post_data ():
             reveiveMes(msg, uid, gid, rol, mid)
     if (botStart is False):
         botStart = True
-        startChat()
+        initialTrain()
     return "OK"
 
 if __name__ == '__main__':
