@@ -35,9 +35,9 @@ def processMessage (mes):
 # 预测复读
 def predictMessage (mes, gid):
     sims = trainMessage.getSortedMessage(mes)
-    if (sims[0][1] < 0.75):
+    if (sims[0][1] < 0.6):
         return
-    response = randomResponseMessage(sims[0][0])
+    response = randomResponseMessage(str(sims[0][0]))
     if (response is None):
         lastCnt[gid] += 1
         return
@@ -47,7 +47,7 @@ def predictMessage (mes, gid):
     if (gid == 1030450471 or gid == 260324771):
         return
 
-    api.send_msg(trainMessage.chatMessage[response], uid = None, gid = gid)
+    api.send_msg(trainMessage.chatMessage[int(response)], uid = None, gid = gid)
 
 # 随机抽取可能的语料库
 def randomResponseMessage (id):

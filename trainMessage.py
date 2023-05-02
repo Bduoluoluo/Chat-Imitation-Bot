@@ -46,11 +46,11 @@ def train ():
                 trainModel()
             for k in lastList:
                 for l in nowList:
-                    if (k not in relateMessage):
-                        relateMessage[k] = {}
-                    if (l not in relateMessage[k]):
-                        relateMessage[k][l] = 0
-                    relateMessage[k][l] += 1
+                    if (str(k) not in relateMessage):
+                        relateMessage[str(k)] = {}
+                    if (str(l) not in relateMessage[str(k)]):
+                        relateMessage[str(k)][str(l)] = 0
+                    relateMessage[str(k)][str(l)] += 1
 
 # 每 60 分钟重新训练一次
 def initialTrain ():

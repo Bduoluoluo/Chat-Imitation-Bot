@@ -12,6 +12,7 @@ def reveiveMes (message, uid, gid = None, rol = None, mid = None):
         trainMessage.train()
         trainMessage.training = False
         trainMessage.saveMessage()
+        send_msg("Done!", None, gid)
         return
     receiveMessage(message, gid)
 
