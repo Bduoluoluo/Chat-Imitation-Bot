@@ -55,7 +55,7 @@ def randomResponseMessage (id):
         return None
     total = 0
     for k in trainMessage.relateMessage[id].keys():
-        if (trainMessage.relateMessage[id][k] < 3):
+        if (trainMessage.relateMessage[id][k] < 3 or len(trainMessage.chatMessage[int(k)]) > 30):
             continue
         total += trainMessage.relateMessage[id][k]
     if (total == 0):
@@ -63,7 +63,7 @@ def randomResponseMessage (id):
     rand = random.uniform(0, total)
     sum = 0
     for k in trainMessage.relateMessage[id].keys():
-        if (trainMessage.relateMessage[id][k] < 3):
+        if (trainMessage.relateMessage[id][k] < 3 or len(trainMessage.chatMessage[int(k)]) > 30):
             continue
         sum += trainMessage.relateMessage[id][k]
         if (rand <= sum):
